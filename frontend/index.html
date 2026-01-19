@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contribution Truth | Evidence-Based Verification</title>
+    <meta name="description" content="Verify group project contributions with evidence, not self-reporting. AI-powered claim verification.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <div class="background-gradient"></div>
+    <div class="noise-overlay"></div>
+    
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">⚖️</span>
+                <span class="logo-text">Contribution<span class="accent">Truth</span></span>
+            </div>
+            <div class="tagline">This system doesn't measure activity. It verifies truth.</div>
+            <div id="api-status" class="api-status"></div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Step 1: Upload Evidence -->
+            <section class="card upload-section" id="upload-section">
+                <div class="card-header">
+                    <span class="step-badge">1</span>
+                    <h2>Upload Evidence</h2>
+                </div>
+                <div class="card-body">
+                    <div class="upload-grid">
+                        <!-- Git Log Upload -->
+                        <div class="upload-box" id="git-upload">
+                            <div class="upload-icon">📊</div>
+                            <h3>Git Log</h3>
+                            <p>JSON output from git log</p>
+                            <input type="file" id="git-file" accept=".json,.txt" hidden>
+                            <button class="btn btn-outline" onclick="document.getElementById('git-file').click()">
+                                Choose File
+                            </button>
+                            <div class="file-name" id="git-filename"></div>
+                        </div>
+                        
+                        <!-- Transcript Upload -->
+                        <div class="upload-box" id="transcript-upload">
+                            <div class="upload-icon">🎙️</div>
+                            <h3>Meeting Transcript</h3>
+                            <p>Text transcript with speakers</p>
+                            <input type="file" id="transcript-file" accept=".txt,.md" hidden>
+                            <button class="btn btn-outline" onclick="document.getElementById('transcript-file').click()">
+                                Choose File
+                            </button>
+                            <div class="file-name" id="transcript-filename"></div>
+                        </div>
+                    </div>
+                    <div class="upload-actions">
+                        <button class="btn btn-primary" id="upload-btn" disabled>
+                            <span class="btn-icon">⬆️</span> Upload Evidence
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 2: Submit Claim -->
+            <section class="card claim-section" id="claim-section">
+                <div class="card-header">
+                    <span class="step-badge">2</span>
+                    <h2>Submit Contribution Claim</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="claimant-name">Claimant Name</label>
+                        <input type="text" id="claimant-name" placeholder="e.g., Alice Johnson" class="input">
+                    </div>
+                    <div class="form-group">
+                        <label for="claim-text">Contribution Claim</label>
+                        <textarea id="claim-text" placeholder="e.g., I implemented the entire user authentication system including JWT tokens, password hashing, and session management." class="textarea" rows="4"></textarea>
+                    </div>
+                    <div class="claim-actions">
+                        <button class="btn btn-accent" id="verify-btn" disabled>
+                            <span class="btn-icon">🔍</span> Verify Claim
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Verdict Display -->
+            <section class="card verdict-section hidden" id="verdict-section">
+                <div class="card-header">
+                    <span class="step-badge">3</span>
+                    <h2>Verification Verdict</h2>
+                </div>
+                <div class="card-body">
+                    <div class="loading-state" id="loading-state">
+                        <div class="spinner"></div>
+                        <p>Gemini is analyzing evidence and attempting to disprove the claim...</p>
+                    </div>
+                    
+                    <div class="verdict-result hidden" id="verdict-result">
+                        <!-- Verdict Badge -->
+                        <div class="verdict-badge" id="verdict-badge">
+                            <span class="verdict-icon"></span>
+                            <span class="verdict-text"></span>
+                        </div>
+                        
+                        <!-- Confidence Score -->
+                        <div class="confidence-meter">
+                            <label>Confidence</label>
+                            <div class="meter">
+                                <div class="meter-fill" id="confidence-fill"></div>
+                            </div>
+                            <span class="confidence-value" id="confidence-value"></span>
+                        </div>
+                        
+                        <!-- Explanation -->
+                        <div class="explanation-box" id="explanation-box">
+                            <h4>Analysis</h4>
+                            <p id="explanation-text"></p>
+                        </div>
+                        
+                        <!-- Evidence Grid -->
+                        <div class="evidence-grid">
+                            <!-- Supporting Evidence -->
+                            <div class="evidence-column supporting">
+                                <h4>✅ Supporting Evidence</h4>
+                                <ul id="supporting-evidence"></ul>
+                            </div>
+                            
+                            <!-- Counter Evidence -->
+                            <div class="evidence-column counter">
+                                <h4>⚠️ Counter Evidence</h4>
+                                <ul id="counter-evidence"></ul>
+                            </div>
+                            
+                            <!-- Missing Evidence -->
+                            <div class="evidence-column missing">
+                                <h4>❔ Missing Evidence</h4>
+                                <ul id="missing-evidence"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Built for Gemini 3 Global Hackathon • Evidence-Backed Truth Verification</p>
+        </footer>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/upload.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

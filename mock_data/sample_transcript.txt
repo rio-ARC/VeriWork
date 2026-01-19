@@ -1,0 +1,47 @@
+Team Meeting - Sprint Planning
+Date: 2024-01-14
+Participants: Alice Chen, Bob Martinez, Carol Davis, Dave Wilson
+
+---
+
+[10:00] Dave Wilson: Alright everyone, let's go over the sprint tasks. We need to build out the authentication system by end of week.
+
+[10:02] Bob Martinez: I can take the lead on auth. I've implemented JWT systems before and I have a solid architecture in mind.
+
+[10:03] Alice Chen: I can help with the auth too. I want to learn more about security.
+
+[10:04] Bob Martinez: Great Alice. Why don't I start with the core implementation - the middleware, password hashing, and session management. You could review my PRs and maybe handle some of the simpler endpoint integrations.
+
+[10:05] Alice Chen: Sounds good to me.
+
+[10:06] Carol Davis: I'll work on the user registration and profile endpoints then.
+
+[10:07] Dave Wilson: Perfect. I'll handle documentation and project setup reviews.
+
+[10:10] Bob Martinez: One thing - the session management is going to be complex. It needs to handle token refresh, revocation, and concurrent sessions. I'll probably need a few days just for that piece.
+
+[10:12] Dave Wilson: That's fine Bob. It's the most critical security component.
+
+---
+
+Sprint Check-in Meeting
+Date: 2024-01-17
+Participants: Alice Chen, Bob Martinez, Carol Davis, Dave Wilson
+
+---
+
+[14:00] Dave Wilson: Quick status update everyone?
+
+[14:01] Bob Martinez: Auth is progressing well. I've finished the password hashing module and the session management system. Currently working on the test suite. Here's a quick walkthrough of the architecture...
+
+[14:05] Bob Martinez: So the middleware validates the JWT, checks the session store, and handles the token refresh transparently. All the crypto uses bcrypt with proper salt rounds.
+
+[14:07] Carol Davis: That's really clean Bob. I integrated my registration endpoint with your auth system yesterday, works great.
+
+[14:08] Alice Chen: I found a typo in one of the middleware comments and fixed it.
+
+[14:09] Bob Martinez: Thanks Alice. Did you get a chance to look at the session management code? I'd love a second pair of eyes on the token refresh logic.
+
+[14:10] Alice Chen: Not yet, I got busy with other coursework. I'll try to look this weekend.
+
+[14:12] Dave Wilson: Alright, sounds like we're on track. Final review meeting on Friday.
