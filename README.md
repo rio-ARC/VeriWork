@@ -2,7 +2,7 @@
 
 > **Evidence-Backed Contribution Verification for Group Projects**
 
-🔗 **Live Demo**: [YOUR_RENDER_URL_HERE](YOUR_RENDER_URL_HERE)
+🔗 **Live Demo**: [VIEW_HERE](https://veriwork-gjt9.onrender.com)
 
 ---
 
