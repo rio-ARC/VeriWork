@@ -2,7 +2,7 @@
 
 > **Evidence-Backed Contribution Verification for Group Projects**
 
-🔗 **Live Demo**: [Frontend](YOUR_VERCEL_URL_HERE) | [API](YOUR_RENDER_URL_HERE)
+🔗 **Live Demo**: [YOUR_RENDER_URL_HERE](YOUR_RENDER_URL_HERE)
 
 ---
 
@@ -48,6 +48,7 @@ VERDICT: ✅ VERIFIED | ⚠️ DISPUTED | ❔ UNVERIFIABLE
 | **Backend** | FastAPI (Python) |
 | **Frontend** | Vanilla JS + CSS (Glassmorphism UI) |
 | **Data Models** | Pydantic |
+| **Deployment** | Render (Docker) |
 | **Testing** | pytest (30 tests) |
 
 ---
@@ -86,8 +87,10 @@ Open: **http://localhost:3000**
 
 ```
 veriwork/
+├── Dockerfile                  # Single deployment config
+├── render.yaml                 # Render deployment
 ├── backend/
-│   ├── main.py                 # FastAPI app
+│   ├── main.py                 # FastAPI + static file serving
 │   ├── api/
 │   │   ├── routes.py           # REST endpoints
 │   │   └── models.py           # Pydantic schemas
@@ -139,15 +142,6 @@ cd backend
 pytest tests/ -v
 # ======================== 30 passed ========================
 ```
-
----
-
-## 🌐 Deployment
-
-| Component | Platform | URL |
-|-----------|----------|-----|
-| Frontend | Vercel | [YOUR_VERCEL_URL_HERE](YOUR_VERCEL_URL_HERE) |
-| Backend | Render | [YOUR_RENDER_URL_HERE](YOUR_RENDER_URL_HERE) |
 
 ---
 

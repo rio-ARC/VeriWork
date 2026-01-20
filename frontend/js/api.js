@@ -1,14 +1,14 @@
 /**
  * API Module - Backend Communication
- * Contribution Truth
+ * VeriWork
  */
 
 const API = {
-    // Auto-detect: use localhost in development, or configure the deployed backend URL
-    // UPDATE THIS after deploying backend to Render!
-    BASE_URL: window.location.hostname === 'localhost'
-        ? 'http://localhost:8000'
-        : 'https://contribution-truth-api.onrender.com',  // <-- Update after Render deploy
+    // When frontend is served from backend, use relative URLs (same origin)
+    // For local development with separate servers, use localhost:8000
+    BASE_URL: window.location.port === '3000'
+        ? 'http://localhost:8000'  // Local dev: frontend on 3000, backend on 8000
+        : '',  // Production: same origin (frontend served by backend)
 
     /**
      * Check API health and Gemini configuration

@@ -5,13 +5,16 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Copy requirements first for caching
-COPY requirements.txt .
+COPY backend/requirements.txt .
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
-COPY . .
+# Copy backend code
+COPY backend/ .
+
+# Copy frontend to static directory inside backend
+COPY frontend/ ./static/
 
 # Expose port
 EXPOSE 8000
