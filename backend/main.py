@@ -44,16 +44,30 @@ async def health_check():
 
 
 # Serve frontend static files
-# Check if frontend directory exists (in deployment, it's copied to /app/static)
-STATIC_DIR = Path(__file__).parent / "static"
-if not STATIC_DIR.exists():
-    # Development: frontend is in sibling directory
-    STATIC_DIR = Path(__file__).parent.parent / "frontend"
+# Try multiple locations for frontend files
+def find_static_dir():
+    """Find the frontend static files directory"""
+    possible_paths = [
+        Path(__file__).parent / "static",           # Docker: copied to /app/static
+        Path(__file__).parent.parent / "frontend",  # Local dev: sibling directory
+        Path("/opt/render/project/src/frontend"),   # Render Python runtime
+    ]
+    
+    for path in possible_paths:
+        if path.exists() and (path / "index.html").exists():
+            return path
+    
+    return None
 
-if STATIC_DIR.exists():
+
+STATIC_DIR = find_static_dir()
+
+if STATIC_DIR:
     # Mount static files (CSS, JS)
-    app.mount("/css", StaticFiles(directory=str(STATIC_DIR / "css")), name="css")
-    app.mount("/js", StaticFiles(directory=str(STATIC_DIR / "js")), name="js")
+    if (STATIC_DIR / "css").exists():
+        app.mount("/css", StaticFiles(directory=str(STATIC_DIR / "css")), name="css")
+    if (STATIC_DIR / "js").exists():
+        app.mount("/js", StaticFiles(directory=str(STATIC_DIR / "js")), name="js")
     
     @app.get("/")
     async def serve_frontend():
@@ -68,5 +82,6 @@ else:
             "version": "1.0.0",
             "status": "operational",
             "tagline": "This system doesn't measure activity. It verifies truth.",
-            "docs": "/docs"
+            "docs": "/docs",
+            "health": "/health"
         }
