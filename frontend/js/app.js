@@ -35,9 +35,9 @@ const App = {
 
         if (health.status === 'healthy') {
             statusEl.className = 'api-status connected';
-            statusEl.innerHTML = health.gemini_api_configured
-                ? '🟢 API Connected • Gemini Ready'
-                : '🟡 API Connected • Gemini API Key Missing';
+            statusEl.innerHTML = health.llm_api_configured
+                ? '🟢 API Connected • AI Model Ready'
+                : '🟡 API Connected • API Key Missing';
         } else {
             statusEl.className = 'api-status disconnected';
             statusEl.innerHTML = '🔴 API Offline - Start backend server';

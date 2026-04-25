@@ -23,7 +23,7 @@ Most tools count commits or lines of code. VeriWork does something different:
 ```
 Student claims: "I implemented the authentication system"
                         ↓
-Gemini AI tries to DISPROVE it using all evidence
+The AI tries to DISPROVE it using all evidence
                         ↓
 VERDICT: ✅ VERIFIED | ⚠️ DISPUTED | ❔ UNVERIFIABLE
 ```
@@ -32,7 +32,7 @@ VERDICT: ✅ VERIFIED | ⚠️ DISPUTED | ❔ UNVERIFIABLE
 
 1. **Upload Evidence**: Git logs + meeting transcripts
 2. **Submit a Claim**: "Alice says she built the login system"
-3. **AI Analysis**: Gemini searches for counter-evidence:
+3. **AI Analysis**: The AI searches for counter-evidence:
    - Are there commits from Alice touching auth files?
    - Did someone ELSE write that code?
    - Did Alice discuss this in meetings?
@@ -44,7 +44,7 @@ VERDICT: ✅ VERIFIED | ⚠️ DISPUTED | ❔ UNVERIFIABLE
 
 | Layer | Technology |
 |-------|------------|
-| **AI** | Google Gemini 2.0 Flash |
+| **AI** | Groq API (openai/gpt-oss-120b) |
 | **Backend** | FastAPI (Python) |
 | **Frontend** | Vanilla JS + CSS (Glassmorphism UI) |
 | **Data Models** | Pydantic |
@@ -57,7 +57,7 @@ VERDICT: ✅ VERIFIED | ⚠️ DISPUTED | ❔ UNVERIFIABLE
 
 ### Prerequisites
 - Python 3.11+
-- Gemini API Key ([Get one free](https://aistudio.google.com/app/apikey))
+- Groq API Key
 
 ### Run Locally
 
@@ -71,7 +71,7 @@ cd backend
 python -m venv venv
 .\venv\Scripts\activate  # Windows
 pip install -r requirements.txt
-$env:GEMINI_API_KEY = "your_api_key"
+$env:GROQ_API_KEY = "your_api_key"
 uvicorn main:app --reload --port 8000
 
 # Frontend (new terminal)
@@ -98,7 +98,7 @@ veriwork/
 │   │   ├── git_parser.py       # Parses git logs
 │   │   └── transcript_parser.py
 │   ├── analysis/
-│   │   ├── gemini_client.py    # Gemini API wrapper
+│   │   ├── llm_client.py       # AI API wrapper
 │   │   └── claim_verifier.py   # THE CORE ENGINE
 │   └── tests/                  # 30 pytest tests
 ├── frontend/

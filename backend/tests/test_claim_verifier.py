@@ -25,12 +25,12 @@ from datetime import datetime
 
 
 class TestHeuristicVerification:
-    """Test heuristic verification (when Gemini is not available)"""
+    """Test heuristic verification (when LLM is not available)"""
     
     @pytest.fixture
     def engine(self):
-        """Create engine without Gemini client"""
-        return ClaimVerificationEngine(gemini_client=None)
+        """Create engine without LLM client"""
+        return ClaimVerificationEngine(llm_client=None)
     
     @pytest.fixture
     def sample_evidence(self):

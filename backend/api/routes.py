@@ -16,7 +16,7 @@ from api.models import (
 from ingestion.git_parser import parse_git_log
 from ingestion.transcript_parser import parse_transcript
 from analysis.claim_verifier import get_verification_engine
-from analysis.gemini_client import is_gemini_configured
+from analysis.llm_client import is_llm_configured
 
 
 router = APIRouter(prefix="/api", tags=["Contribution Truth"])
@@ -142,7 +142,7 @@ async def evidence_status():
         "git_commits": len(_current_evidence.git_log.commits) if _current_evidence.git_log else 0,
         "transcript_statements": transcript_statements,
         "contributors": _current_evidence.all_contributors,
-        "gemini_enabled": is_gemini_configured()
+        "llm_enabled": is_llm_configured()
     }
 
 

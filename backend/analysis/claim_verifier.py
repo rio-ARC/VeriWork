@@ -23,7 +23,7 @@ from api.models import (
     VerdictType,
     VerificationVerdict,
 )
-from analysis.gemini_client import GeminiClient, get_gemini_client, is_gemini_configured
+from analysis.llm_client import LLMClient, get_llm_client, is_llm_configured
 
 
 class ClaimVerificationEngine:
@@ -32,7 +32,7 @@ class ClaimVerificationEngine:
     
     This system doesn't measure activity. It verifies truth.
     
-    Given a claim like "I implemented the login system", Gemini autonomously
+    Given a claim like "I implemented the login system", the AI autonomously
     tries to DISPROVE it using all available evidence:
     - Are there git commits from this student touching auth files?
     - Do meeting transcripts show them discussing login?
@@ -40,9 +40,9 @@ class ClaimVerificationEngine:
     - Is there evidence someone ELSE actually built it?
     """
     
-    def __init__(self, gemini_client: Optional[GeminiClient] = None):
+    def __init__(self, llm_client: Optional[LLMClient] = None):
         """Initialize the verification engine."""
-        self.gemini = gemini_client
+        self.llm = llm_client
         self._evidence: Optional[EvidenceCollection] = None
     
     def set_evidence(self, evidence: EvidenceCollection):
@@ -69,22 +69,22 @@ class ClaimVerificationEngine:
                 claimant, claim, "No evidence has been uploaded for analysis."
             )
         
-        # Prepare evidence context for Gemini
+        # Prepare evidence context for LLM
         evidence_context = self._prepare_evidence_context()
         
-        # If Gemini is not configured, use heuristic analysis
-        if not is_gemini_configured() or not self.gemini:
+        # If LLM is not configured, use heuristic analysis
+        if not is_llm_configured() or not self.llm:
             return self._heuristic_verification(claimant, claim, evidence_context)
         
         # === THE DISPROVAL LOOP ===
         # Wrapped in try-catch to gracefully handle API errors (rate limits, etc.)
         try:
-            # Step 1: Ask Gemini what evidence MUST exist if claim is true
+            # Step 1: Ask LLM what evidence MUST exist if claim is true
             expected_evidence = await self._get_expected_evidence(claim, claimant)
             
-            # If we got an empty response, Gemini might be failing - try heuristic
+            # If we got an empty response, LLM might be failing - try heuristic
             if not expected_evidence:
-                print("Gemini returned empty response, falling back to heuristic mode")
+                print("LLM returned empty response, falling back to heuristic mode")
                 return self._heuristic_verification(claimant, claim, evidence_context)
             
             # Step 2: Search for supporting evidence
@@ -111,7 +111,7 @@ class ClaimVerificationEngine:
             
         except Exception as e:
             error_msg = str(e)
-            print(f"Gemini API error, falling back to heuristic: {error_msg}")
+            print(f"LLM API error, falling back to heuristic: {error_msg}")
             
             # Check if it's a rate limit error
             if "429" in error_msg or "quota" in error_msg.lower() or "rate" in error_msg.lower():
@@ -119,7 +119,7 @@ class ClaimVerificationEngine:
                 result = self._heuristic_verification(claimant, claim, evidence_context)
                 result.explanation = result.explanation.replace(
                     "(Heuristic mode",
-                    "(Heuristic mode - Gemini API rate limited, please wait 30 seconds and retry for AI analysis"
+                    "(Heuristic mode - LLM API rate limited, please wait 30 seconds and retry for AI analysis"
                 )
                 return result
             else:
@@ -128,7 +128,7 @@ class ClaimVerificationEngine:
                 return result
     
     def _prepare_evidence_context(self) -> str:
-        """Prepare all evidence as context string for Gemini."""
+        """Prepare all evidence as context string for the AI."""
         parts = []
         
         if self._evidence.git_log and self._evidence.git_log.commits:
@@ -149,7 +149,7 @@ class ClaimVerificationEngine:
         return "\n".join(parts)
     
     async def _get_expected_evidence(self, claim: str, claimant: str) -> str:
-        """Ask Gemini what evidence should exist if the claim is true."""
+        """Ask the AI what evidence should exist if the claim is true."""
         prompt = f"""A team member named "{claimant}" claims: "{claim}"
 
 If this claim is TRUE, what specific evidence MUST we expect to find in:
@@ -159,7 +159,7 @@ If this claim is TRUE, what specific evidence MUST we expect to find in:
 List the expected evidence as bullet points. Be specific about what we'd look for."""
 
         try:
-            return await self.gemini.analyze(prompt)
+            return await self.llm.analyze(prompt)
         except Exception as e:
             print(f"Error getting expected evidence: {e}")
             return ""
@@ -198,7 +198,7 @@ OUTPUT FORMAT (JSON array):
 Return ONLY the JSON array, no other text. If no supporting evidence found, return []."""
 
         try:
-            response = await self.gemini.analyze(prompt)
+            response = await self.llm.analyze(prompt)
             return self._parse_evidence_list(response, claim_type="supporting")
         except Exception as e:
             print(f"Error finding supporting evidence: {e}")
@@ -243,7 +243,7 @@ OUTPUT FORMAT (JSON array):
 Return ONLY the JSON array. If no counter-evidence found, return []."""
 
         try:
-            response = await self.gemini.analyze(prompt)
+            response = await self.llm.analyze(prompt)
             return self._parse_evidence_list(response, claim_type="counter")
         except Exception as e:
             print(f"Error finding counter evidence: {e}")
@@ -276,7 +276,7 @@ OUTPUT FORMAT (JSON array of strings):
 Return ONLY the JSON array. If all expected evidence is present, return []."""
 
         try:
-            response = await self.gemini.analyze(prompt)
+            response = await self.llm.analyze(prompt)
             return self._parse_string_list(response)
         except Exception as e:
             print(f"Error finding missing evidence: {e}")
@@ -293,7 +293,7 @@ Return ONLY the JSON array. If all expected evidence is present, return []."""
     ) -> VerificationVerdict:
         """Synthesize the final verdict from all evidence."""
         
-        # Prepare summary for Gemini
+        # Prepare summary for AI
         supporting_summary = "\n".join(
             f"- {e.summary} (source: {e.source}, strength: {e.strength.value})"
             for e in supporting
@@ -333,7 +333,7 @@ OUTPUT FORMAT (JSON):
 Return ONLY the JSON object."""
 
         try:
-            response = await self.gemini.analyze(prompt)
+            response = await self.llm.analyze(prompt)
             result = self._parse_verdict_response(response)
             
             return VerificationVerdict(
@@ -353,7 +353,7 @@ Return ONLY the JSON object."""
             )
     
     def _parse_evidence_list(self, response: str, claim_type: str) -> list[Evidence]:
-        """Parse Gemini's response into Evidence objects."""
+        """Parse AI's response into Evidence objects."""
         try:
             # Extract JSON from response
             json_match = re.search(r'\[[\s\S]*\]', response)
@@ -377,7 +377,7 @@ Return ONLY the JSON object."""
             return []
     
     def _parse_string_list(self, response: str) -> list[str]:
-        """Parse Gemini's response into a list of strings."""
+        """Parse AI's response into a list of strings."""
         try:
             json_match = re.search(r'\[[\s\S]*\]', response)
             if not json_match:
@@ -390,7 +390,7 @@ Return ONLY the JSON object."""
             return []
     
     def _parse_verdict_response(self, response: str) -> dict:
-        """Parse Gemini's verdict response."""
+        """Parse AI's verdict response."""
         try:
             json_match = re.search(r'\{[\s\S]*\}', response)
             if not json_match:
@@ -426,7 +426,7 @@ Return ONLY the JSON object."""
         evidence_context: str
     ) -> VerificationVerdict:
         """
-        Fallback heuristic verification when Gemini is not available.
+        Fallback heuristic verification when the LLM is not available.
         
         Uses simple pattern matching to find evidence.
         """
@@ -474,7 +474,7 @@ Return ONLY the JSON object."""
         elif claimant_mentions > 0:
             verdict = VerdictType.UNVERIFIABLE
             confidence = 0.4
-            explanation = f"Limited evidence found for {claimant}'s claim. Found {claimant_mentions} mentions but insufficient to confirm specific contributions. Enable Gemini API for deeper analysis."
+            explanation = f"Limited evidence found for {claimant}'s claim. Found {claimant_mentions} mentions but insufficient to confirm specific contributions. Enable Groq API for deeper analysis."
         else:
             verdict = VerdictType.DISPUTED
             confidence = 0.6
@@ -491,7 +491,7 @@ Return ONLY the JSON object."""
             claimant=claimant,
             verdict=verdict,
             confidence=confidence,
-            explanation=explanation + " (Heuristic mode - configure GEMINI_API_KEY for AI-powered analysis)",
+            explanation=explanation + " (Heuristic mode - configure GROQ_API_KEY for AI-powered analysis)",
             supporting_evidence=supporting,
             counter_evidence=counter,
             missing_evidence=missing
@@ -506,9 +506,9 @@ def get_verification_engine() -> ClaimVerificationEngine:
     """Get or create the verification engine singleton."""
     global _engine
     if _engine is None:
-        gemini = None
-        if is_gemini_configured():
-            from analysis.gemini_client import get_gemini_client
-            gemini = get_gemini_client()
-        _engine = ClaimVerificationEngine(gemini)
+        llm = None
+        if is_llm_configured():
+            from analysis.llm_client import get_llm_client
+            llm = get_llm_client()
+        _engine = ClaimVerificationEngine(llm)
     return _engine

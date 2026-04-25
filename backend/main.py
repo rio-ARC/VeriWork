@@ -35,11 +35,11 @@ app.include_router(api_router)
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
-    from analysis.gemini_client import is_gemini_configured
+    from analysis.llm_client import is_llm_configured
     
     return {
         "status": "healthy",
-        "gemini_api_configured": is_gemini_configured()
+        "llm_api_configured": is_llm_configured()
     }
 
 

@@ -20,7 +20,7 @@ const API = {
             return await response.json();
         } catch (error) {
             console.error('Health check failed:', error);
-            return { status: 'error', gemini_api_configured: false };
+            return { status: 'error', llm_api_configured: false };
         }
     },
 
